@@ -1,0 +1,3 @@
+micrograd_c/.vscode/*
+micrograd_c/build/*
+.DS_Store
