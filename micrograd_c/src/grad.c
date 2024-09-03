@@ -1,27 +1,27 @@
 #include "grad.h"
 
-Value* tanh_value(Value *a, char label)
+Value* tanh_value(Value *a, char *label)
 {
-    Value *res = value_new(tanh(a->value);, (Value *[]){a}, 1, "tanh");
+    Value *res = new_value(tanh(a->value), (Value *[]){a}, 1, "tanh", label);
     return res;
 }
 
-Value* exp_value(Value *a, Value *b, char label)
+Value* exp_value(Value *a, char *label)
 {
-    Value *res = new_value(exp(a->value),(Value *[]){a}, 1, 'e', label);
+    Value *res = new_value(exp(a->value),(Value *[]){a}, 1, "exp", label);
     return res;
 }
 
-Value* relu_value(Value *a, char label)
+Value* relu_value(Value *a, char *label)
 {
-    Value *res = new_value( a->value > 0 ? a->value : 0, (Value *[]){a}, 1, 'r', label);
+    Value *res = new_value( a->value > 0 ? a->value : 0, (Value *[]){a}, 1, "relu", label);
     return res;
 }
 
-Value* pow_value(Value *a, double b, char label)
+Value* pow_value(Value *a, double b, char *label)
 {
-    Value *b_val = new_value(b, NULL,0, "p",  label);
-    Value *res = new_value(pow(a->value, b), (Value*[]){a, b_val}, 2, 'p', label);
+    Value *b_val = new_value(b, NULL,0, "power",  "B");
+    Value *res = new_value(pow(a->value, b), (Value*[]){a, b_val}, 2, "**", label);
     return res;
 }
 
@@ -31,9 +31,9 @@ void mul_value_backward(Value *_v)
     _v->prev[1]->grad += _v->grad * _v->prev[0]->value;
 }
 
-Value* mul_value(Value *a, Value *b, char label)
+Value* mul_value(Value *a, Value *b, char *label)
 {
-    Value *res = new_value(a->value * b->value, (Value*[]){a, b}, 2, '*', label);
+    Value *res = new_value(a->value * b->value, (Value*[]){a, b}, 2, "*", label);
     res->backward = mul_value_backward;
     return res;
 }
@@ -44,14 +44,14 @@ void add_value_backward(Value *_v)
     _v->prev[1]->grad += _v->grad;
 }
 
-Value* add_value(Value *a, Value *b, char label)
+Value* add_value(Value *a, Value *b, char *label)
 {
-    Value *res = new_value(a->value + b->value, (Value*[]){a, b}, 2, '+', label);
+    Value *res = new_value(a->value + b->value, (Value*[]){a, b}, 2, "+", label);
     res->backward = add_value_backward;
     return res;
 }
 
-Value* new_value(float _value, Value **children, int children_len, char _op, char _label)
+Value* new_value(float _value, Value **children, int children_len, char *_op, char *_label)
 {
     Value* value_struct = (Value*)malloc(sizeof(Value));
     if(value_struct == NULL){
@@ -87,9 +87,9 @@ void free_value(Value *_v)
 
 void print_node(Value* head)
 {
-    printf("|Value: %.2f | Grad: %.2f | Op: %c | Label: %c |\n", head->value, head->grad, head->op, head->label);
+    printf("|Value: %.2f | Grad: %.2f | Op: %s | Label: %s |\n", head->value, head->grad, head->op, head->label);
     for(int i = 0; i<head->prev_count; i++){
-        printf("|Value: %.2f | Grad: %.2f | Op: %c | Label: %c |\n", head->prev[i]->value, head->prev[i]->grad, head->prev[i]->op, head->prev[i]->label);
+        printf("|Value: %.2f | Grad: %.2f | Op: %s | Label: %s |\n", head->prev[i]->value, head->prev[i]->grad, head->prev[i]->op, head->prev[i]->label);
     }
 }
 

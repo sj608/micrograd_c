@@ -26,23 +26,23 @@ Formulat ->:
 typedef struct Value{
     float value;
     float grad;
-    char op;
-    char label;
+    char* op;
+    char* label;
     struct Value **prev;
     int prev_count;
     void (*backward)(struct Value *);
 } Value;
 
 
-Value* tanh_value(Value *a, Value *b, char label);
-Value* exp_value(Value *a, Value *b, char label);
-Value* relu_value(Value *a, char label);
-Value* pow_value(Value *a, double *b, char label);
+Value* tanh_value(Value *a, char *label);
+Value* exp_value(Value *a, char *label);
+Value* relu_value(Value *a, char *label);
+Value* pow_value(Value *a, double b, char *label);
 void mul_value_backward(Value *_v);
-Value* mul_value(Value *a, Value *b, char label);
+Value* mul_value(Value *a, Value *b, char *label);
 void add_value_backward(Value *_v);
-Value* add_value(Value *a, Value *b, char label);
-Value* new_value(float _value, Value **childern, int children_len, char _op, char _label);
+Value* add_value(Value *a, Value *b, char *label);
+Value* new_value(float _value, Value **childern, int children_len, char *_op, char *_label);
 void free_value(Value *_v);
 
 
