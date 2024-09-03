@@ -1,14 +1,53 @@
 #include "grad.h"
 
+Value* tanh_value(Value *a, char label)
+{
+    Value *res = value_new(tanh(a->value);, (Value *[]){a}, 1, "tanh");
+    return res;
+}
+
+Value* exp_value(Value *a, Value *b, char label)
+{
+    Value *res = new_value(exp(a->value),(Value *[]){a}, 1, 'e', label);
+    return res;
+}
+
+Value* relu_value(Value *a, char label)
+{
+    Value *res = new_value( a->value > 0 ? a->value : 0, (Value *[]){a}, 1, 'r', label);
+    return res;
+}
+
+Value* pow_value(Value *a, double b, char label)
+{
+    Value *b_val = new_value(b, NULL,0, "p",  label);
+    Value *res = new_value(pow(a->value, b), (Value*[]){a, b_val}, 2, 'p', label);
+    return res;
+}
+
+void mul_value_backward(Value *_v)
+{
+    _v->prev[0]->grad += _v->grad * _v->prev[1]->value;
+    _v->prev[1]->grad += _v->grad * _v->prev[0]->value;
+}
+
 Value* mul_value(Value *a, Value *b, char label)
 {
     Value *res = new_value(a->value * b->value, (Value*[]){a, b}, 2, '*', label);
+    res->backward = mul_value_backward;
     return res;
+}
+
+void add_value_backward(Value *_v)
+{
+    _v->prev[0]->grad += _v->grad;
+    _v->prev[1]->grad += _v->grad;
 }
 
 Value* add_value(Value *a, Value *b, char label)
 {
     Value *res = new_value(a->value + b->value, (Value*[]){a, b}, 2, '+', label);
+    res->backward = add_value_backward;
     return res;
 }
 
@@ -48,7 +87,10 @@ void free_value(Value *_v)
 
 void print_node(Value* head)
 {
-    printf("|Value: %.2f | Grad: %.2f | Op: %c | Label: %c |", head->value, head->grad, head->op, head->label);
+    printf("|Value: %.2f | Grad: %.2f | Op: %c | Label: %c |\n", head->value, head->grad, head->op, head->label);
+    for(int i = 0; i<head->prev_count; i++){
+        printf("|Value: %.2f | Grad: %.2f | Op: %c | Label: %c |\n", head->prev[i]->value, head->prev[i]->grad, head->prev[i]->op, head->prev[i]->label);
+    }
 }
 
 
