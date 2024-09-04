@@ -1,27 +1,64 @@
 #include "grad.h"
 
+void log_value_backward(Value *_v)
+{
+    _v->prev[0]->grad +=(1/_v->prev[0]->value)*_v->grad;
+}
+Value* log_value(Value *a, char *label)
+{
+    Value *res = new_value(log(a->value), (Value*[]){a}, 1, "log", label);
+    res->backward = log_value_backward;
+    return res;
+}
+
+void tanh_value_backward(Value *_v)
+{
+    _v->prev[0]->grad += (1 - _v->value * _v->value) * _v->grad;
+}
+
 Value* tanh_value(Value *a, char *label)
 {
     Value *res = new_value(tanh(a->value), (Value *[]){a}, 1, "tanh", label);
+    res->backward = tanh_value_backward;
     return res;
+}
+
+void exp_value_backward(Value *_v)
+{
+    _v->prev[0]->grad += _v->grad * _v->value;
 }
 
 Value* exp_value(Value *a, char *label)
 {
     Value *res = new_value(exp(a->value),(Value *[]){a}, 1, "exp", label);
+    res->backward = exp_value_backward;
     return res;
 }
+
+void relu_value_backward(Value *_v)
+ {
+     _v->prev[0]->grad += (_v->value > 0) * _v->grad;
+ }
 
 Value* relu_value(Value *a, char *label)
 {
     Value *res = new_value( a->value > 0 ? a->value : 0, (Value *[]){a}, 1, "relu", label);
+    res->backward = relu_value_backward;
     return res;
+}
+
+void pow_value_backward(Value *_v)
+{
+    double b = _v->prev[1]->value;
+    _v->prev[0]->grad += (b * pow(_v->prev[0]->value, b - 1)) * _v->grad;
 }
 
 Value* pow_value(Value *a, double b, char *label)
 {
     Value *b_val = new_value(b, NULL,0, "power",  "B");
     Value *res = new_value(pow(a->value, b), (Value*[]){a, b_val}, 2, "**", label);
+    res->backward = pow_value_backward;
+    free_value(b_val);
     return res;
 }
 

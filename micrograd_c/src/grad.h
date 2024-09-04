@@ -34,9 +34,15 @@ typedef struct Value{
 } Value;
 
 
+void log_value_backward(Value *_v);
+Value* log_value(Value *a, char *label);
+void tanh_value_backward(Value *_v);
 Value* tanh_value(Value *a, char *label);
+void exp_value_backward(Value *_v);
 Value* exp_value(Value *a, char *label);
+void relu_value_backward(Value* _v);
 Value* relu_value(Value *a, char *label);
+void pow_value_backward(Value *_v);
 Value* pow_value(Value *a, double b, char *label);
 void mul_value_backward(Value *_v);
 Value* mul_value(Value *a, Value *b, char *label);
